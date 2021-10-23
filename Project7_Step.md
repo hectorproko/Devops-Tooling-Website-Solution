@@ -140,7 +140,8 @@ UUID=Suffs0-E50z-6bwx-kCFk-5cfN-ecnI-3s0Xm4 /mnt/apps             xfs     defaul
 UUID=BAPXhu-XZ0I-S0Go-0uAT-EcFj-KJzX-6etnCA /mnt/logs             xfs     defaults        0 0
 UUID=LuEjkp-3IbF-9C3n-2TuM-21Qe-fR95-Frwfar /mnt/opt              xfs     defaults        0 0
 ```
-Use **sudo mount -a** check for errors
+Use **sudo mount -a** check for errors <br>
+Lets set up permissions that will allow our Web servers to read, write and execute files on NFS:
 
 Installing **NFS server**, configure to start on reboot and make sure it is up and running
 ```bash
@@ -154,5 +155,10 @@ For simplicity, in this project all Instances (tiers) are inside the same **subn
 
 Now I need to check which **subnet** my **NFS Server** is in
 
-![Markdown Logo](https://raw.githubusercontent.com/hectorproko/WEB-SOLUTION-WITH-WORDPRESS/main/Images/port3306.png)
+![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/subnet.png)
  <br>
+ ![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/subnet2.png)
+ <br>
+
+ As we can see **IPv4 CIDR** is **172.31.80.0/20**
+
