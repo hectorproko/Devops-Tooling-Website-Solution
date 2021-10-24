@@ -389,3 +389,45 @@ mysql> select * FROM users;
 
 1 row in set (0.00 sec) 
 ```
+We wont be using password saved as hash so I will make another entry
+``` sql
+mysql> INSERT INTO `users` (`id`, `username`, `password`, `email`, `user_type`, `status`) VALUES (2, 'myuser2', '1234', 'user@mail.com', 'admin', '1
+');                                                                                                                                                                         
+Query OK, 1 row affected (0.00 sec)                                                                                                                                                      
+mysql>
+```
+``` sql
+mysql> select * from users;
++----+----------+----------------------------------+---------------+-----------+--------+
+| id | username | password                         | email         | user_type | status |
++----+----------+----------------------------------+---------------+-----------+--------+
+|  1 | admin    | 21232f297a57a5a743894a0e4a801fc3 | dare@dare.com | admin     | 1      |
+|  2 | myuser2  | 1234                             | user@mail.com | admin     | 1      |
++----+----------+----------------------------------+---------------+-----------+--------+
+```
+Before trying to login with this user we need make sure we have **PHP** installed in **webservers**
+``` bash
+#Install the EPEL repository
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+#Install yum utils #dnf is a package manager
+sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+#Reset the PHP modules.
+sudo dnf module reset php
+#Enabling the PHP 7.4 module
+sudo dnf module enable php:remi-7.4
+#Install PHP, PHP-FPM (FastCGI Process Manager) and associated PHP modules
+sudo dnf install php php-opcache php-gd php-curl php-mysqlnd
+#To verify the version installed and confirm installation 
+php -v 
+
+#Start and enable PHP-FPM on boot-up.
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+
+#You might need to instruct SELinux to allow Apache to execute the PHP code via PHP-FPM run
+setsebool -P httpd_execmem 1
+
+#Restart Apache web server for PHP to work with Apache web server.
+$ sudo systemctl restart httpd
+
+```
