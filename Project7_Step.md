@@ -431,3 +431,7 @@ setsebool -P httpd_execmem 1
 $ sudo systemctl restart httpd
 
 ```
+Now I'll test the login page accessing it with any browser using Public IP of my **webserver** instance
+<br>
+ ![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/adminpage.png)
+ <br>
