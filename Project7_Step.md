@@ -1,4 +1,4 @@
-# Prepare NFS Server
+# PREPARE NFS SERVER
 
 To start I will we using my AWS account to create an EC2 instance with Red-Hat as the OS. This will become my **NFS Server**.
 
@@ -151,8 +151,25 @@ sudo systemctl start nfs-server.service
 sudo systemctl enable nfs-server.service #start on boot
 sudo systemctl status nfs-server.service 
 ```
+We set up permission that will allow our Web servers to read, write and execute files on NFS
+```bash
+sudo chown -R nobody: /mnt/apps #changes user and group to nobody, a way to tell the kernel that any user can read and write access to the file
+sudo chown -R nobody: /mnt/logs
+sudo chown -R nobody: /mnt/opt
+sudo chmod -R 777 /mnt/apps
+sudo chmod -R 777 /mnt/logs
+sudo chmod -R 777 /mnt/opt
+sudo systemctl restart nfs-server.service
+```
+```bash
+[ec2-user@ip-172-31-88-22 ~]$ ls -l /mnt/
+total 0
+drwxrwxrwx. 2 nobody nobody 6 Sep 22 00:18 apps
+drwxrwxrwx. 2 nobody nobody 6 Sep 22 00:18 logs
+drwxrwxrwx. 2 nobody nobody 6 Sep 22 00:18 opt
+[ec2-user@ip-172-31-88-22 ~]$
+```
 For simplicity, in this project all Instances (tiers) are inside the same **subnet**
-
 Now I need to check which **subnet** my **NFS Server** is in
 
 ![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/subnet.png)
@@ -162,3 +179,51 @@ Now I need to check which **subnet** my **NFS Server** is in
 
  As we can see **IPv4 CIDR** is **172.31.80.0/20**
 
+Configuring access to NFS for clients within the same subnet 
+``` perl
+[ec2-user@ip-172-31-88-22 ~]$ sudo vi /etc/exports #edit this file
+[ec2-user@ip-172-31-88-22 ~]$ cat /etc/exports 
+/mnt/apps 172.31.80.0/20(rw,sync,no_all_squash,no_root_squash) #added
+/mnt/logs 172.31.80.0/20(rw,sync,no_all_squash,no_root_squash) #added
+/mnt/opt 172.31.80.0/20(rw,sync,no_all_squash,no_root_squash) #added
+
+[ec2-user@ip-172-31-88-22 ~]$ sudo exportfs -arv #used to maintain the current table of exported file systems for NFS
+exporting 172.31.80.0/20:/mnt/opt
+exporting 172.31.80.0/20:/mnt/logs
+exporting 172.31.80.0/20:/mnt/apps
+
+[ec2-user@ip-172-31-88-22 ~]$
+```
+
+Now we make sure the following ports are open to hosts from the same subnet **172.31.80.0/20** <br>
+Use link:
+[Opening Ports in AWS](https://github.com/hectorproko/RepeatableSteps_tutorials/blob/main/OpenPortAWS.md)
+
+ ![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/ports.png)
+ <br>
+
+ # CONFIGURE THE DATABASE SERVER
+The following takes place in **NFS Server** <br>
+```bash
+sudo yum install mysql-server -y #Installation 
+sudo mysql_secure_installation #additional setup
+
+sudo systemctl start mysqld #starting it
+
+sudo mysql #to access MySQL
+```
+Creating a database called **tooling** and user **webaccess** with all priviledges from **subnet 172.31.80.0/20**
+``` sql
+mysql> CREATE DATABASE `tooling`;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> CREATE USER `webaccess`@`172.31.80.0/20` IDENTIFIED WITH mysql_native_password BY 'Passw0rd!'
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> GRANT ALL ON tooling.* TO 'webaccess'@'172.31.80.0/20';
+Query OK, 0 rows affected (0.00 sec)
+```
+# PREPARE THE WEB SERVERS
+We need to make sure that our Web Servers can serve the same content from shared storage solutions, in this case NFS Server and MySQL database. This means we will be able to add new ones or remove them whenever we need, and the integrity of the data (in the database and on NFS) will be preserved making the webservers **stateless**
+
+we will utilize NFS and mount previously created Logical Volume lv-apps to the folder where Apache stores files to be served to the users (/var/www).
