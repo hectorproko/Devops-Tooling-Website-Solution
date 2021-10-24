@@ -270,6 +270,14 @@ html
 [ec2-user@ip-172-31-88-22 apps]$
 ```
 
-Note 1: Do not forget to open TCP port 80 on the Web Server.
-Note 2: If you encounter 403 Error – check permissions to your /var/www/html folder and also disable SELinux sudo setenforce 0
-To make this change permanent – open following config file sudo vi /etc/sysconfig/selinux and set SELINUX=disabled.
+Open **TCP** port **80** on the Web Server.
+Use link:
+[Opening Ports in AWS](https://github.com/hectorproko/RepeatableSteps_tutorials/blob/main/OpenPortAWS.md)  <br> 
+
+Disable SELinux 
+```bash
+sudo setenforce 0
+#to make it permanent set SELINUX=disabled in /etc/sysconfig/selinux
+```
+Note 2: If you encounter 403 Error – check permissions to your /var/www/html folder 
+
