@@ -223,6 +223,9 @@ Query OK, 0 rows affected (0.00 sec)
 mysql> GRANT ALL ON tooling.* TO 'webaccess'@'172.31.80.0/20';
 Query OK, 0 rows affected (0.00 sec)
 ```
+
+Make sure to open port 3306
+
 # PREPARE THE WEB SERVERS
 We need to make sure that our Web Servers can serve the same content from shared storage solutions, in this case NFS Server and MySQL database. This means we will be able to add new ones or remove them whenever we need, and the integrity of the data (in the database and on NFS) will be preserved making the webservers **stateless**
 
@@ -306,3 +309,30 @@ Start Apache
 ```bash
 sudo systemctl start httpd
 ```
+Testing page hosting
+<br>
+ ![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/site.png)
+ <br>
+
+ From repo https://github.com/hectorproko/tooling.git I will get directory **/html** and put it in our local **/var/www/** to host a different test site.
+
+Now I will disable the default site in Apache by renaming a file **welcome.config**
+``` bash
+[ec2-user@ip-172-31-86-103 ~]$ sudo mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.backup
+[ec2-user@ip-172-31-86-103 ~]$ cd /etc/httpd/conf.d/
+[ec2-user@ip-172-31-86-103 conf.d]$ ls
+autoindex.conf  README  userdir.conf  welcome.backup
+[ec2-user@ip-172-31-86-103 conf.d]$ sudo systemctl restart httpd #restarting after edit
+```
+Now when I test the site
+<br>
+ ![Markdown Logo](https://raw.githubusercontent.com/hectorproko/Devops-Tooling-Website-Solution/main/images/indexof.png)
+ <br>
+
+ For the site to connect to we need to configure database information in **functions.php**
+ ``` php
+// connect to database
+//NFS Server IP, Database and User we created earlier
+$db = mysqli_connect('172.31.88.22', 'webaccess', 'Passw0rd!', 'tooling');
+```
+
