@@ -337,3 +337,9 @@ Now when I test the site
 $db = mysqli_connect('172.31.88.22', 'webaccess', 'Passw0rd!', 'tooling');
 ```
 
+Now we run SQL script **tooling-db.sql** in **NFS Server** found in repo https://github.com/hectorproko/tooling
+```bash
+#To run locally in NFS Server
+sudo mysql tooling < tooling-db.sql
+#To run remotely from webserver
+sudo mysql -h 172.31.88.22 -u webaccess -p tooling < tooling-db.sql
