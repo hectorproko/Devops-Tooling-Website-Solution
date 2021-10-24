@@ -336,6 +336,11 @@ Now when I test the site
 //NFS Server IP, Database and User we created earlier
 $db = mysqli_connect('172.31.88.22', 'webaccess', 'Passw0rd!', 'tooling');
 ```
+Also for simplicity I will comment out a portion of the code that converts passwords to hash before saving them in the database (in functions.php)
+``` bash
+#line 122 
+#$password = md5($password); 
+```
 
 Now we run SQL script **tooling-db.sql** in **NFS Server** found in repo https://github.com/hectorproko/tooling
 ```bash
@@ -343,3 +348,44 @@ Now we run SQL script **tooling-db.sql** in **NFS Server** found in repo https:/
 sudo mysql tooling < tooling-db.sql
 #To run remotely from webserver
 sudo mysql -h 172.31.88.22 -u webaccess -p tooling < tooling-db.sql
+```
+Script creates a table **users** in database **tooling** and creates an entry for **admin** (not going to use this user)
+```bash
+sudo mysqld #Checking mysql in NFS Server
+```
+``` sql
+mysql> use tooling;                                                                                             
+Reading table information for completion of table and column names                                              
+You can turn off this feature to get a quicker startup with -A                                                  
+                                                                                                                
+Database changed                                                                                                
+mysql> show tables;                                                                                             
++-------------------+                                                                                           
+| Tables_in_tooling |                                                                                           
++-------------------+                                                                                           
+| users             |                                                                                           
++-------------------+                                                                                           
+1 row in set (0.00 sec)                                                                                         
+                                                                                                                
+mysql> desc users;                                                                                              
++-----------+--------------+------+-----+---------+----------------+                                            
+| Field     | Type         | Null | Key | Default | Extra          |                                            
++-----------+--------------+------+-----+---------+----------------+                                            
+| id        | int          | NO   | PRI | NULL    | auto_increment |                                            
+| username  | varchar(255) | NO   |     | NULL    |                |                                            
+| password  | varchar(255) | NO   |     | NULL    |                |                                            
+| email     | varchar(255) | NO   |     | NULL    |                |                                            
+| user_type | varchar(255) | NO   |     | NULL    |                |                                            
+| status    | varchar(10)  | NO   |     | NULL    |                |                                            
++-----------+--------------+------+-----+---------+----------------+                                            
+6 rows in set (0.00 sec)                                                                                        
+                                                                                                                                                                                                             
+mysql> select * FROM users;                                                                                     
++----+----------+----------------------------------+---------------+-----------+--------+                       
+| id | username | password                         | email         | user_type | status |                       
++----+----------+----------------------------------+---------------+-----------+--------+                       
+|  1 | admin    | 21232f297a57a5a743894a0e4a801fc3 | dare@dare.com | admin     | 1      |                       
++----+----------+----------------------------------+---------------+-----------+--------+                       
+
+1 row in set (0.00 sec) 
+```
