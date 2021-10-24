@@ -281,3 +281,28 @@ sudo setenforce 0
 ```
 Note 2: If you encounter 403 Error – check permissions to your /var/www/html folder 
 
+Mounting /mnt/logs in NFS Server to local (webserver) /var/log/httpd/
+``` bash
+ sudo mount -t nfs -o rw,nosuid 172.31.88.22:/mnt/logs /var/log/httpd/
+```
+Testing the mount
+``` bash
+#This time creating file on NFS Server
+[ec2-user@ip-172-31-88-22 apps]$ cd /mnt/logs/
+[ec2-user@ip-172-31-88-22 logs]$ ls
+[ec2-user@ip-172-31-88-22 logs]$ touch ThisIsALog #creating file
+[ec2-user@ip-172-31-88-22 logs]$ ls
+ThisIsALog
+[ec2-user@ip-172-31-88-22 logs]$
+
+
+#Webserver
+[ec2-user@ip-172-31-86-103 ~]$ ls /var/log/httpd/
+ThisIsALog #I see the file
+[ec2-user@ip-172-31-86-103 ~]$
+```
+
+Start Apache
+```bash
+sudo systemctl start httpd
+```
