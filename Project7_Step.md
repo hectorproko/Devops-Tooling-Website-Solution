@@ -226,4 +226,50 @@ Query OK, 0 rows affected (0.00 sec)
 # PREPARE THE WEB SERVERS
 We need to make sure that our Web Servers can serve the same content from shared storage solutions, in this case NFS Server and MySQL database. This means we will be able to add new ones or remove them whenever we need, and the integrity of the data (in the database and on NFS) will be preserved making the webservers **stateless**
 
-we will utilize NFS and mount previously created Logical Volume lv-apps to the folder where Apache stores files to be served to the users (/var/www).
+We will utilize NFS and mount previously created **Logical Volume lv-apps** (via mnt/apps) to the folder where Apache stores files to be served to the users **/var/www**.
+
+The following steps can be repeated in as many servers as needed.<br>
+Install NFS client
+```bash
+yum update -y
+sudo yum install nfs-utils nfs4-acl-tools -y
+```
+Mouning /mnt/apps in NFS server to our local /var/www
+```
+sudo mkdir /var/www #
+sudo mount -t nfs -o rw,nosuid 172.31.88.22:/mnt/apps /var/www 
+```
+``` bash
+#line to add in /etc/fstab for mount to persists after boot
+172.31.88.22:/mnt/apps /var/www nfs defaults 0 0
+```
+Testing the mount
+``` bash
+#Webserver
+[ec2-user@ip-172-31-82-171 www]$ ls
+[ec2-user@ip-172-31-82-171 www]$ touch CreatedFromNoneRemote #creating file
+[ec2-user@ip-172-31-82-171 www]$ ls
+CreatedFromNoneRemote
+[ec2-user@ip-172-31-82-171 www]$
+
+#NFS Server
+[ec2-user@ip-172-31-88-22 ~]$ cd /mnt/apps/
+[ec2-user@ip-172-31-88-22 apps]$ ls
+CreatedFromNoneRemote #file appears
+[ec2-user@ip-172-31-88-22 apps]$
+```
+Installing Apache
+```bash
+sudo yum install httpd -y
+```
+After install I can see html folder from **NFS Server**
+``` bash
+#NFS Server
+[ec2-user@ip-172-31-88-22 apps]$ ls /mnt/apps/
+html
+[ec2-user@ip-172-31-88-22 apps]$
+```
+
+Note 1: Do not forget to open TCP port 80 on the Web Server.
+Note 2: If you encounter 403 Error – check permissions to your /var/www/html folder and also disable SELinux sudo setenforce 0
+To make this change permanent – open following config file sudo vi /etc/sysconfig/selinux and set SELINUX=disabled.
