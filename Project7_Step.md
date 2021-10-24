@@ -224,7 +224,8 @@ mysql> GRANT ALL ON tooling.* TO 'webaccess'@'172.31.80.0/20';
 Query OK, 0 rows affected (0.00 sec)
 ```
 
-Make sure to open port 3306
+Make sure to also open port **3306** Type **TCP** and restrict accesss(**resource**) to subnet **172.31.80.0/20**<br>
+[Opening Ports in AWS](https://github.com/hectorproko/RepeatableSteps_tutorials/blob/main/OpenPortAWS.md)  <br> 
 
 # PREPARE THE WEB SERVERS
 We need to make sure that our Web Servers can serve the same content from shared storage solutions, in this case NFS Server and MySQL database. This means we will be able to add new ones or remove them whenever we need, and the integrity of the data (in the database and on NFS) will be preserved making the webservers **stateless**
