@@ -6,5 +6,4 @@ Technologies/Tools used:
 * AWS (EC2)(EBS)
 * Red Hat Enterprise Linux 8 (HVM)
 * MySQL
-* Wordpress
 * GitBash
